@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "experiment/experiment.hpp"
+#include "experiment/number.hpp"
+#include "experiment/node.hpp"
 
 #include <iostream>
 
