@@ -12,7 +12,6 @@ namespace orca
     using node_ptr_t = std::shared_ptr<Node>;
     using node_ptr_coll_t = std::vector<node_ptr_t>;
 
-    template<typename R>
     class Visitor;
   }
 }

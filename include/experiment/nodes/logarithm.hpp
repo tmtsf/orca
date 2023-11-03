@@ -12,8 +12,7 @@ namespace orca
     public:
       Logarithm(const node_ptr_t& arg);
     private:
-      template<typename R>
-      R accept(const Visitor<R>& v) const;
+      void accept(Visitor& v) const;
     };
   }
 }

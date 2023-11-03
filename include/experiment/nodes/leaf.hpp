@@ -11,9 +11,10 @@ namespace orca
     {
     public:
       Leaf(double value);
+      virtual double getValue(void) const override;
+      virtual void setValue(double value) override;
     private:
-      template<typename R>
-      R accept(const Visitor<R>& v) const;
+      void accept(Visitor& v) const;
     private:
       double m_Value;
     };

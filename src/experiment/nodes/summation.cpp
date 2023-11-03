@@ -10,8 +10,7 @@ namespace orca
         Node({lhs, rhs})
     { }
 
-    template<typename R>
-    R Summation::accept(const Visitor<R>& v) const
+    void Summation::accept(Visitor& v) const
     {
       return v.visit(*this);
     }

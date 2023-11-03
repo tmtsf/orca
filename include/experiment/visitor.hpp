@@ -10,16 +10,15 @@ namespace orca
 {
   namespace experiment
   {
-    template<typename R>
     class Visitor
     {
     public:
       virtual ~Visitor(void) = default;
     public:
-      virtual R visit(Summation&) const = 0;
-      virtual R visit(Multiplication&) const = 0;
-      virtual R visit(Logarithm&) const = 0;
-      virtual R visit(Leaf&) const = 0;
+      virtual void visit(const Summation&) = 0;
+      virtual void visit(const Multiplication&) = 0;
+      virtual void visit(const Logarithm&) = 0;
+      virtual void visit(const Leaf&) = 0;
     };
   }
 }

@@ -10,8 +10,7 @@ namespace orca
         Node({lhs, rhs})
     { }
 
-    template<typename R>
-    R Multiplication::accept(const Visitor<R>& v) const
+    void Multiplication::accept(Visitor& v) const
     {
       return v.visit(*this);
     }

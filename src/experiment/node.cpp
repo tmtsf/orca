@@ -16,6 +16,7 @@ namespace orca
     {
       return m_Nodes;
     }
+
     double Node::getValue(void) const
     {
       throw("getValue() is not implemented");
@@ -25,12 +26,6 @@ namespace orca
     void Node::setValue(double value)
     {
       throw("setValue() is not implemented");
-    }
-
-    template<typename R>
-    R Node::accept(const Visitor<R>& v)
-    {
-      return v.visit(*this);
     }
 
     node_ptr_t makeLeafNode(double value)

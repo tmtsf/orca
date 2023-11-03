@@ -11,10 +11,19 @@ namespace orca
       m_Value(value)
     { }
 
-    template<typename R>
-    R Leaf::accept(const Visitor<R>& v) const
+    void Leaf::accept(Visitor& v) const
     {
       return v.visit(*this);
+    }
+
+    double Leaf::getValue(void) const
+    {
+      return m_Value;
+    }
+
+    void Leaf::setValue(double value)
+    {
+      m_Value = value;
     }
   }
 }

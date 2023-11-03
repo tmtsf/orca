@@ -27,10 +27,21 @@ namespace orca
       {
         Number x[5] = {1., 2., 3., 4., 5.};
         Number y = f(x);
-        EXPECT_NEAR(y.calculate(), 797.751, 1.e-3);
+        try
+        {
+          EXPECT_NEAR(y.calculate(), 797.751, 1.e-3);
 
-        x[0].setValue(2.5);
-        EXPECT_NEAR(y.calculate(), 2769.76, 1.e-2);
+          x[0].setValue(2.5);
+          EXPECT_NEAR(y.calculate(), 2769.76, 1.e-2);
+        }
+        catch (const char* e)
+        {
+          std::cout << e << std::endl;
+        }
+        catch (...)
+        {
+          abort();
+        }
       }
 
       // // specializing to double

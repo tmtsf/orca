@@ -32,7 +32,8 @@ namespace orca
     double Number::calculate(void) const
     {
       EvaluationVisitor v;
-      return m_Node->accept(v);
+      m_Node->accept(v);
+      return v.getResult();
     }
   }
 }

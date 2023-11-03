@@ -16,8 +16,8 @@ namespace orca
       const node_ptr_coll_t& children(void) const;
       virtual double getValue(void) const;
       virtual void setValue(double value);
-      template<typename R>
-      R accept(const Visitor<R>&);
+
+      virtual void accept(Visitor&) const = 0;
     protected:
       node_ptr_coll_t m_Nodes;
     };

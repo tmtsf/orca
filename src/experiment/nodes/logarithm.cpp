@@ -10,8 +10,7 @@ namespace orca
         Node({arg})
     { }
 
-    template<typename R>
-    R Logarithm::accept(const Visitor<R>& v) const
+    void Logarithm::accept(Visitor& v) const
     {
       return v.visit(*this);
     }

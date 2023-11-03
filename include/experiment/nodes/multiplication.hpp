@@ -12,8 +12,7 @@ namespace orca
     public:
       Multiplication(const node_ptr_t& lhs, const node_ptr_t& rhs);
     private:
-      template<typename R>
-      R accept(const Visitor<R>& v) const;
+      void accept(Visitor& v) const;
     };
   }
 }

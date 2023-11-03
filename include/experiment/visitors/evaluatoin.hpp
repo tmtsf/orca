@@ -7,25 +7,44 @@ namespace orca
 {
   namespace experiment
   {
-    class EvaluationVisitor : public Visitor<double>
+    class EvaluationVisitor : public Visitor
     {
     public:
-      virtual double visit(Summation& n) const
+      EvaluationVisitor(void) :
+        m_Result(0.)
+      {}
+    public:
+      virtual void visit(const Summation& n) override
       {
-        return n.children()[0]->accept(*this) + n.children()[1]->accept(*this);
+        n.children()[0]->accept(*this);
+        double temp = m_Result;
+
+        n.children()[1]->accept(*this);
+        m_Result += temp;
       }
-      virtual double visit(Multiplication& n) const
+      virtual void visit(const Multiplication& n) override
       {
-        return n.children()[0]->accept(*this) * n.children()[1]->accept(*this);
+        n.children()[0]->accept(*this);
+        double temp = m_Result;
+
+        n.children()[1]->accept(*this);
+        m_Result *= temp;
       }
-      virtual double visit(Logarithm& n) const
+      virtual void visit(const Logarithm& n) override
       {
-        return std::log(n.children()[0]->accept(*this));
+        n.children()[0]->accept(*this);
+        m_Result = std::log(m_Result);
       }
-      virtual double visit(Leaf& n) const
+      virtual void visit(const Leaf& n) override
       {
-        return n.getValue();
+        m_Result = n.getValue();
       }
+      double getResult(void) const
+      {
+        return m_Result;
+      }
+    private:
+      double m_Result;
     };
   }
 }
