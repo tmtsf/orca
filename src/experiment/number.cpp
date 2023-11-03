@@ -1,6 +1,6 @@
 #include "experiment/number.hpp"
 #include "experiment/node.hpp"
-#include "experiment/visitors/evaluatoin.hpp"
+#include "experiment/visitors/evaluation.hpp"
 
 namespace orca
 {
