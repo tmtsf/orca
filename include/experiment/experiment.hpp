@@ -15,5 +15,6 @@ namespace orca
     class Visitor;
 
     using visited_node_value_map_t = std::unordered_map<size_t, double>;
+    using visited_node_map_t = std::unordered_map<size_t, bool>;
   }
 }

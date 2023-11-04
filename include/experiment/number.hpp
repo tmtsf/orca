@@ -15,7 +15,9 @@ namespace orca
       const node_ptr_t& node(void) const;
       double getValue(void) const;
       void setValue(double value);
+
       double calculate(void) const;
+      void printLog(void) const;
     private:
       node_ptr_t m_Node;
     };

@@ -1,6 +1,7 @@
 #include "experiment/number.hpp"
 #include "experiment/node.hpp"
 #include "experiment/visitors/evaluation.hpp"
+#include "experiment/visitors/log.hpp"
 
 namespace orca
 {
@@ -34,6 +35,12 @@ namespace orca
       EvaluationVisitor v;
       m_Node->accept(v);
       return v.getResult();
+    }
+
+    void Number::printLog(void) const
+    {
+      LogVisitor v;
+      m_Node->accept(v);
     }
   }
 }

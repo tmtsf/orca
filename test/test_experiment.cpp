@@ -21,7 +21,31 @@ namespace orca
       }
     }
 
-    TEST(test_experiment, simple)
+    TEST(calculation_graph, log)
+    {
+      // specializing to Number
+      {
+        Number x[5] = {1., 2., 3., 4., 5.};
+        Number y = f(x);
+        std::cout << "Printing calculation log for expression: \n"
+                  << "y1 = x[2] * (5.0 * x[0] + x[1]);\n"
+                  << "y2 = log(y1);\n"
+                  << "y = (y1 + x[3] * y2) * (y1 + y2);\n"
+                  << "with x[5] = {1., 2., 3., 4., 5.};\n\n";
+        y.printLog();
+
+        x[0].setValue(2.5);
+        std::cout << "\n\n"
+                  << "Printing calculation log for expression: \n"
+                  << "y1 = x[2] * (5.0 * x[0] + x[1]);\n"
+                  << "y2 = log(y1);\n"
+                  << "y = (y1 + x[3] * y2) * (y1 + y2);\n"
+                  << "with x[5] = {2.5, 2., 3., 4., 5.};\n\n";
+        y.printLog();
+      }
+    }
+
+    TEST(calculation_graph, evaluation)
     {
       // specializing to Number
       {
@@ -43,14 +67,6 @@ namespace orca
           abort();
         }
       }
-
-      // // specializing to double
-      // // would not compile, for log in the experiment namesapce is ambiguous
-      // {
-      //   double x[5] = {1., 2., 3., 4., 5.};
-      //   double y = f(x);
-      //   std::cout << y << std::endl;
-      // }
     }
   }
 }
