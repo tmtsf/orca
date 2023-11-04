@@ -10,11 +10,21 @@ namespace orca
   {
     Node::Node(const node_ptr_coll_t& nodes) :
       m_Nodes(nodes)
-    {}
+    {
+      ++m_Count;
+      m_ID = m_Count;
+    }
 
     const node_ptr_coll_t& Node::children(void) const
     {
       return m_Nodes;
+    }
+
+    size_t Node::m_Count = 0;
+
+    size_t Node::id(void) const
+    {
+      return m_ID;
     }
 
     double Node::getValue(void) const

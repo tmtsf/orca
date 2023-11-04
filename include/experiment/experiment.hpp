@@ -13,5 +13,7 @@ namespace orca
     using node_ptr_coll_t = std::vector<node_ptr_t>;
 
     class Visitor;
+
+    using visited_node_value_map_t = std::unordered_map<size_t, double>;
   }
 }

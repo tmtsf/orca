@@ -20,6 +20,7 @@ namespace orca
       double getResult(void) const;
     private:
       double m_Result;
+      visited_node_value_map_t m_Visited;
     };
   }
 }
