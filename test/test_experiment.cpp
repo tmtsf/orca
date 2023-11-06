@@ -1,13 +1,16 @@
 #include "gtest/gtest.h"
 
-#include "experiment/number.hpp"
-#include "experiment/node.hpp"
+#include "experiment/lazy/number.hpp"
+#include "experiment/lazy/node.hpp"
+
+#include "experiment/eager/number.hpp"
+#include "experiment/eager/node.hpp"
 
 #include <iostream>
 
 namespace orca
 {
-  namespace experiment
+  namespace test
   {
     namespace
     {
@@ -45,12 +48,46 @@ namespace orca
     //   }
     // }
 
-    TEST(calculation_graph, evaluation)
+    TEST(lazy, evaluation)
     {
       // specializing to Number
       {
-        Number x[5] = {1., 2., 3., 4., 5.};
-        Number y = f(x);
+        experiment::lazy::Number x[5] = {1., 2., 3., 4., 5.};
+        experiment::lazy::Number y = f(x);
+        try
+        {
+          dbl_t value = 797.751;
+          EXPECT_NEAR(y.calculate(), value, 1.e-3);
+          const auto& adjoints = y.adjoints();
+
+          const dbl_vec_t& expected = {950.736, 190.147, 443.677, 73.2041, 0.};
+          for (size_t i = 1; i <= 5; ++i)
+          {
+            dbl_t adjoint = adjoints.count(i) ? adjoints.at(i) : 0.;
+            EXPECT_NEAR(adjoint, expected[i - 1], 1.e-3);
+            // std::cout << i << ": " << adjoint << std::endl;
+          }
+
+          // x[0].setValue(2.5);
+          // EXPECT_NEAR(y.calculate(), 2769.76, 1.e-2);
+        }
+        catch (const char* e)
+        {
+          std::cout << e << std::endl;
+        }
+        catch (...)
+        {
+          abort();
+        }
+      }
+    }
+
+    TEST(eager, evaluation)
+    {
+      // specializing to Number
+      {
+        experiment::eager::Number x[5] = {1., 2., 3., 4., 5.};
+        experiment::eager::Number y = f(x);
         try
         {
           dbl_t value = 797.751;
