@@ -1,6 +1,6 @@
 #pragma once
 
-#include "experiment/eager/experiment.hpp"
+#include "experiment/eager/eager.hpp"
 #include "experiment/eager/node.hpp"
 
 namespace orca { namespace experiment { namespace eager {
@@ -10,9 +10,6 @@ namespace orca { namespace experiment { namespace eager {
     Leaf(dbl_t value);
     virtual dbl_t getValue(void) const override;
     virtual void setValue(dbl_t value) override;
-  private:
-    void accept(Visitor& v) const;
-  private:
-    dbl_t m_Value;
+    virtual void propagateAdjoint(void) override;
   };
 } } }

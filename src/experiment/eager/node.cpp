@@ -5,53 +5,64 @@
 #include "experiment/eager/number.hpp"
 
 namespace orca { namespace experiment { namespace eager {
-    Node::Node(const node_ptr_coll_t& nodes) :
-      m_Nodes(nodes)
-    {
-      ++m_Count;
-      m_ID = m_Count;
-    }
+  Node::Node(const node_ptr_coll_t& nodes) :
+    m_Nodes(nodes),
+    m_Result(0.),
+    m_Adjoint(0.)
+  { }
 
-    const node_ptr_coll_t& Node::children(void) const
-    {
-      return m_Nodes;
-    }
+  dbl_t Node::getValue(void) const
+  {
+    throw("getValue() is not implemented");
+    return 0.;
+  }
 
-    size_t Node::m_Count = 0;
+  void Node::setValue(dbl_t value)
+  {
+    throw("setValue() is not implemented");
+  }
 
-    size_t Node::id(void) const
-    {
-      return m_ID;
-    }
+  value_t Node::result(void) const
+  {
+    return m_Result;
+  }
 
-    dbl_t Node::getValue(void) const
-    {
-      throw("getValue() is not implemented");
-      return 0.;
-    }
+  adjoint_t& Node::adjoint(void)
+  {
+    return m_Adjoint;
+  }
 
-    void Node::setValue(dbl_t value)
-    {
-      throw("setValue() is not implemented");
-    }
+  void Node::resetAdjoints(void)
+  {
+    for (auto n : m_Nodes)
+      n->resetAdjoints();
 
-    node_ptr_t makeLeafNode(dbl_t value)
-    {
-      return std::make_shared<Leaf>(value);
-    }
+    m_Adjoint = 0.;
+  }
 
-    node_ptr_t operator+(const Number& lhs, const Number& rhs)
-    {
-      return std::make_shared<Summation>(lhs.node(), rhs.node());
-    }
+  node_ptr_t makeLeafNode(dbl_t value)
+  {
+    return new Leaf(value);
+  }
 
-    node_ptr_t operator*(const Number& lhs, const Number& rhs)
-    {
-      return std::make_shared<Multiplication>(lhs.node(), rhs.node());
-    }
+  Number operator+(const Number& lhs, const Number& rhs)
+  {
+    node_ptr_t n = new Summation(lhs.node(), rhs.node());
+    Number::m_Tape.emplace_back(n);
+    return n;
+  }
 
-    node_ptr_t log(const Number& arg)
-    {
-      return std::make_shared<Logarithm>(arg.node());
-    }
+  Number operator*(const Number& lhs, const Number& rhs)
+  {
+    node_ptr_t n = new Multiplication(lhs.node(), rhs.node());
+    Number::m_Tape.emplace_back(n);
+    return n;
+  }
+
+  Number log(const Number& arg)
+  {
+    node_ptr_t n = new Logarithm(arg.node());
+    Number::m_Tape.emplace_back(n);
+    return n;
+  }
 } } }

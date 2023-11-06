@@ -1,6 +1,6 @@
 #pragma once
 
-#include "experiment/eager/experiment.hpp"
+#include "experiment/eager/eager.hpp"
 #include "experiment/eager/node.hpp"
 
 namespace orca { namespace experiment { namespace eager {
@@ -8,7 +8,6 @@ namespace orca { namespace experiment { namespace eager {
   {
   public:
     Logarithm(const node_ptr_t& arg);
-  private:
-    void accept(Visitor& v) const;
+    virtual void propagateAdjoint(void) override;
   };
 } } }

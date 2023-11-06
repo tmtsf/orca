@@ -91,14 +91,13 @@ namespace orca
         try
         {
           dbl_t value = 797.751;
-          EXPECT_NEAR(y.calculate(), value, 1.e-3);
-          const auto& adjoints = y.adjoints();
+          EXPECT_NEAR(y.result(), value, 1.e-3);
 
+          y.propagateAdjoints();
           const dbl_vec_t& expected = {950.736, 190.147, 443.677, 73.2041, 0.};
-          for (size_t i = 1; i <= 5; ++i)
+          for (size_t i = 0; i < 5; ++i)
           {
-            dbl_t adjoint = adjoints.count(i) ? adjoints.at(i) : 0.;
-            EXPECT_NEAR(adjoint, expected[i - 1], 1.e-3);
+            EXPECT_NEAR(x[i].adjoint(), expected[i], 1.e-3);
             // std::cout << i << ": " << adjoint << std::endl;
           }
 

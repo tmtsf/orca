@@ -1,6 +1,6 @@
 #pragma once
 
-#include "experiment/lazy/experiment.hpp"
+#include "experiment/lazy/lazy.hpp"
 #include "experiment/lazy/node.hpp"
 
 namespace orca { namespace experiment { namespace lazy {

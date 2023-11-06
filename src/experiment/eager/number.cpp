@@ -1,52 +1,57 @@
 #include "experiment/eager/number.hpp"
 #include "experiment/eager/node.hpp"
-#include "experiment/eager/visitors/evaluation.hpp"
-#include "experiment/eager/visitors/log.hpp"
-#include "experiment/eager/visitors/adjoint.hpp"
 
 namespace orca { namespace experiment { namespace eager {
-    Number::Number(dbl_t value) :
-      m_Node(makeLeafNode(value))
-    {}
+  tape_t Number::m_Tape;
 
-    Number::Number(const node_ptr_t& node) :
-      m_Node(node)
-    {}
+  Number::Number(dbl_t value) :
+    m_Node(makeLeafNode(value))
+  {
+    m_Tape.emplace_back(m_Node);
+  }
 
-    const node_ptr_t& Number::node(void) const
+  Number::Number(const node_ptr_t& node) :
+    m_Node(node)
+  {  }
+
+  const node_ptr_t& Number::node(void) const
+  {
+    return m_Node;
+  }
+
+  dbl_t Number::getValue(void) const
+  {
+    return m_Node->getValue();
+  }
+
+  void Number::setValue(dbl_t value)
+  {
+    m_Node->setValue(value);
+  }
+
+  value_t Number::result(void) const
+  {
+    return m_Node->result();
+  }
+
+  adjoint_t& Number::adjoint(void)
+  {
+    return m_Node->adjoint();
+  }
+
+  void Number::propagateAdjoints(void)
+  {
+    m_Node->resetAdjoints();
+    m_Node->adjoint() = 1.;
+
+    auto it = m_Tape.rbegin();
+    while (it->get() != m_Node)
+      ++it;
+
+    while (it != m_Tape.rend())
     {
-      return m_Node;
+      (*it)->propagateAdjoint();
+      ++it;
     }
-
-    dbl_t Number::getValue(void) const
-    {
-      return m_Node->getValue();
-    }
-
-    void Number::setValue(dbl_t value)
-    {
-      m_Node->setValue(value);
-    }
-
-    dbl_t Number::calculate(void) const
-    {
-      EvaluationVisitor v;
-      m_Node->accept(v);
-      m_Values = v.values();
-      return v.getResult();
-    }
-
-    void Number::printLog(void) const
-    {
-      LogVisitor v;
-      m_Node->accept(v);
-    }
-
-    const adjoint_map_t& Number::adjoints(void) const
-    {
-      AdjointVisitor v(m_Values);
-      m_Node->accept(v);
-      m_Adjoints = v.ajoints();
-      return m_Adjoints;
-    }
+  }
 } } }

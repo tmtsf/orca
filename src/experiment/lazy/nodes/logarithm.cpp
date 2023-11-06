@@ -3,12 +3,12 @@
 #include "experiment/lazy/visitor.hpp"
 
 namespace orca { namespace experiment { namespace lazy {
-    Logarithm::Logarithm(const node_ptr_t& arg) :
-        Node({arg})
-    { }
+  Logarithm::Logarithm(const node_ptr_t& arg) :
+      Node({arg})
+  { }
 
-    void Logarithm::accept(Visitor& v) const
-    {
-      return v.visit(*this);
-    }
+  void Logarithm::accept(Visitor& v) const
+  {
+    return v.visit(*this);
+  }
 } } }
