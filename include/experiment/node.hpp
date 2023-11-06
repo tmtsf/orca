@@ -16,8 +16,8 @@ namespace orca
       const node_ptr_coll_t& children(void) const;
       size_t id(void) const;
 
-      virtual double getValue(void) const;
-      virtual void setValue(double value);
+      virtual dbl_t getValue(void) const;
+      virtual void setValue(dbl_t value);
 
       virtual void accept(Visitor&) const = 0;
     protected:
@@ -26,7 +26,7 @@ namespace orca
       size_t m_ID;
     };
 
-    node_ptr_t makeLeafNode(double value);
+    node_ptr_t makeLeafNode(dbl_t value);
     node_ptr_t operator+(const Number& lhs, const Number& rhs);
     node_ptr_t operator*(const Number& lhs, const Number& rhs);
     node_ptr_t log(const Number& arg);

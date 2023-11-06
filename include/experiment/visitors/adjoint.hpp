@@ -7,10 +7,10 @@ namespace orca
 {
   namespace experiment
   {
-    class EvaluationVisitor : public Visitor
+    class AdjointVisitor : public Visitor
     {
     public:
-      EvaluationVisitor(void);
+      AdjointVisitor(const value_map_t& values);
     public:
       virtual void visit(const Summation& n) override;
       virtual void visit(const Multiplication& n) override;
@@ -18,10 +18,14 @@ namespace orca
       virtual void visit(const Leaf& n) override;
 
       dbl_t getResult(void) const;
-      value_map_t values(void) const;
+      const adjoint_map_t& ajoints(void) const;
     private:
-      dbl_t m_Result;
-      value_map_t m_Visited;
+      void initializeAdjointIfNecessary(size_t id);
+    private:
+      adjoint_t m_Adjoint;
+      adjoint_map_t m_Adjoints;
+      value_map_t m_Values;
+      bool m_Root;
     };
   }
 }

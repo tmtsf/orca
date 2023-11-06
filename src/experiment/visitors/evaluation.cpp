@@ -20,7 +20,7 @@ namespace orca
       }
 
       n.children()[0]->accept(*this);
-      double temp = m_Result;
+      dbl_t temp = m_Result;
 
       n.children()[1]->accept(*this);
       m_Result += temp;
@@ -39,7 +39,7 @@ namespace orca
       }
 
       n.children()[0]->accept(*this);
-      double temp = m_Result;
+      dbl_t temp = m_Result;
 
       n.children()[1]->accept(*this);
       m_Result *= temp;
@@ -79,9 +79,14 @@ namespace orca
       // std::cout << id << ": " << m_Result << std::endl;
     }
 
-    double EvaluationVisitor::getResult(void) const
+    dbl_t EvaluationVisitor::getResult(void) const
     {
       return m_Result;
+    }
+
+    value_map_t EvaluationVisitor::values(void) const
+    {
+      return m_Visited;
     }
   }
 }

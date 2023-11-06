@@ -6,7 +6,7 @@ namespace orca
 {
   namespace experiment
   {
-    Leaf::Leaf(double value) :
+    Leaf::Leaf(dbl_t value) :
       Node({}),
       m_Value(value)
     { }
@@ -16,12 +16,12 @@ namespace orca
       return v.visit(*this);
     }
 
-    double Leaf::getValue(void) const
+    dbl_t Leaf::getValue(void) const
     {
       return m_Value;
     }
 
-    void Leaf::setValue(double value)
+    void Leaf::setValue(dbl_t value)
     {
       m_Value = value;
     }

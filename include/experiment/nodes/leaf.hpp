@@ -10,13 +10,13 @@ namespace orca
     class Leaf : public Node
     {
     public:
-      Leaf(double value);
-      virtual double getValue(void) const override;
-      virtual void setValue(double value) override;
+      Leaf(dbl_t value);
+      virtual dbl_t getValue(void) const override;
+      virtual void setValue(dbl_t value) override;
     private:
       void accept(Visitor& v) const;
     private:
-      double m_Value;
+      dbl_t m_Value;
     };
   }
 }

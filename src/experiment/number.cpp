@@ -2,12 +2,13 @@
 #include "experiment/node.hpp"
 #include "experiment/visitors/evaluation.hpp"
 #include "experiment/visitors/log.hpp"
+#include "experiment/visitors/adjoint.hpp"
 
 namespace orca
 {
   namespace experiment
   {
-    Number::Number(double value) :
+    Number::Number(dbl_t value) :
       m_Node(makeLeafNode(value))
     {}
 
@@ -20,20 +21,21 @@ namespace orca
       return m_Node;
     }
 
-    double Number::getValue(void) const
+    dbl_t Number::getValue(void) const
     {
       return m_Node->getValue();
     }
 
-    void Number::setValue(double value)
+    void Number::setValue(dbl_t value)
     {
       m_Node->setValue(value);
     }
 
-    double Number::calculate(void) const
+    dbl_t Number::calculate(void) const
     {
       EvaluationVisitor v;
       m_Node->accept(v);
+      m_Values = v.values();
       return v.getResult();
     }
 
@@ -41,6 +43,14 @@ namespace orca
     {
       LogVisitor v;
       m_Node->accept(v);
+    }
+
+    const adjoint_map_t& Number::adjoints(void) const
+    {
+      AdjointVisitor v(m_Values);
+      m_Node->accept(v);
+      m_Adjoints = v.ajoints();
+      return m_Adjoints;
     }
   }
 }

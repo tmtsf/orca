@@ -27,18 +27,18 @@ namespace orca
       return m_ID;
     }
 
-    double Node::getValue(void) const
+    dbl_t Node::getValue(void) const
     {
       throw("getValue() is not implemented");
       return 0.;
     }
 
-    void Node::setValue(double value)
+    void Node::setValue(dbl_t value)
     {
       throw("setValue() is not implemented");
     }
 
-    node_ptr_t makeLeafNode(double value)
+    node_ptr_t makeLeafNode(dbl_t value)
     {
       return std::make_shared<Leaf>(value);
     }

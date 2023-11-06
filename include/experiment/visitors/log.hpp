@@ -15,7 +15,7 @@ namespace orca
       virtual void visit(const Logarithm& n) override;
       virtual void visit(const Leaf& n) override;
     private:
-      visited_node_map_t m_Visited;
+      value_map_t m_Visited;
     };
   }
 }
