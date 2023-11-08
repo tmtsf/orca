@@ -5,7 +5,9 @@
 #include <vector>
 #include <cmath>
 #include <unordered_map>
-#include <unordered_set>
+#include <array>
+#include <list>
+#include <iterator>
 
 namespace orca
 {
