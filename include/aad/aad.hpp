@@ -5,9 +5,11 @@
 
 namespace orca { namespace aad {
   class Node;
-  class BlockList;
   class Tape;
   class Number;
+
+  template<typename T, size_t S>
+  class BlockList;
 
   using value_t = dbl_t;
   using value_ptr_t = value_t*;
