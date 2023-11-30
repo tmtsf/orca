@@ -19,10 +19,10 @@ namespace orca { namespace simulation {
     virtual void generatePath(const dbl_vec_t& gaussVector,
                               scenario_t<T>& path) const = 0;
 
-    virtual model_ptr_t clone(void) const = 0;
+    virtual model_ptr_t<T> clone(void) const = 0;
 
     virtual const std::vector<T*>& parameters(void) = 0;
-    virtual const std::vector<string_t>& parameterLabels(void) const = 0;
+    virtual const string_vec_t& parameterLabels(void) const = 0;
 
     size_t numParams(void) const
     {

@@ -17,6 +17,6 @@ namespace orca { namespace simulation {
     virtual void payoffs(const scenario_t<T>& path,
                          std::vector<T>& payoffs) const = 0;
 
-    virtual product_ptr_t clone(void) const = 0;
+    virtual product_ptr_t<T> clone(void) const = 0;
   };
 }}

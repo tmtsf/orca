@@ -8,6 +8,8 @@
 #include <array>
 #include <list>
 #include <iterator>
+#include <algorithm>
+#include <sstream>
 
 namespace orca
 {
@@ -17,4 +19,10 @@ namespace orca
 
   using string_t = std::string;
   using string_vec_t = std::vector<string_t>;
+
+  using uint_t = unsigned int;
+  using uint_vec_t = std::vector<uint_t>;
+
+  using ulong_t = unsigned long;
+  using ulong_vec_t = std::vector<ulong_t>;
 }

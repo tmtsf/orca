@@ -1,5 +1,5 @@
 #include "aad/node.hpp"
-#include "aad/util.hpp"
+#include "math/util.hpp"
 
 namespace orca { namespace aad {
   Node::Node(void) :
@@ -18,7 +18,7 @@ namespace orca { namespace aad {
 
   void Node::propagateOne(void)
   {
-    if (m_Arity == 0 || !util::isZeroToMachineTolerance(m_SelfAdjoint))
+    if (m_Arity == 0 || !math::util::isZeroToMachineTolerance(m_SelfAdjoint))
       return;
 
     for (size_t i = 0; i < m_Arity; ++i)
