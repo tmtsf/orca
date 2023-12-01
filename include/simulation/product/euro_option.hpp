@@ -25,7 +25,7 @@ namespace orca { namespace simulation { namespace product {
       // Defline: only one sample on the expiry date
       m_Defline.resize(1U);
       m_Defline[0].m_Numeraire = true;
-      m_Defline[0].m_ForwardMaturities.push_back(settlement);
+      m_Defline[0].m_ForwardMaturities.push_back(expiry);
       m_Defline[0].m_DiscountMaturities.push_back(settlement);
 
       std::ostringstream oss;
