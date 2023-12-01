@@ -8,7 +8,7 @@
 #include <iostream>
 
 namespace orca { namespace test {
-  TEST(SerialSimulation, EuropeanOption)
+  TEST(ParallelSimulation, EuropeanOption)
   {
     double spot = 100.;
     double discount = .03;
@@ -28,7 +28,7 @@ namespace orca { namespace test {
 
     simulation::rng::Sobol rng;
     size_t numPaths = std::pow(2, 26) - 1;
-    auto results = simulation::simulate(model, option, rng, numPaths);
+    auto results = simulation::parallelSimulate(model, option, rng, numPaths);
 
     double sum(0.);
     for (const auto& path : results)

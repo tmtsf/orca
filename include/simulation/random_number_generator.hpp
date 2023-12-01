@@ -16,5 +16,7 @@ namespace orca { namespace simulation {
     virtual rng_ptr_t clone(void) const = 0;
 
     virtual size_t simDimension(void) const = 0;
+
+    virtual void skipTo(uint_t b) = 0;
   };
 }}
