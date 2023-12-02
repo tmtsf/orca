@@ -6,6 +6,7 @@
 #include "simulation/util.hpp"
 
 #include <iostream>
+#include <chrono>
 
 namespace orca { namespace test {
   TEST(ParallelSimulation, EuropeanOption)
@@ -28,7 +29,12 @@ namespace orca { namespace test {
 
     simulation::rng::Sobol rng;
     size_t numPaths = std::pow(2, 26) - 1;
+
+    const auto start{std::chrono::steady_clock::now()};
     auto results = simulation::parallelSimulate(model, option, rng, numPaths);
+    const auto end{std::chrono::steady_clock::now()};
+    const std::chrono::duration<double> elapsed_seconds{end - start};
+    std::cout << "Parallel simulation: " << elapsed_seconds.count() << "s\n";
 
     double sum(0.);
     for (const auto& path : results)
@@ -39,6 +45,6 @@ namespace orca { namespace test {
       }
     }
 
-    std::cout << sum / numPaths << std::endl;
+    std::cout << "European option price: " << sum / numPaths << std::endl;
   }
 }}

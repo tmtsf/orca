@@ -16,10 +16,10 @@ namespace orca { namespace simulation { namespace rng {
     virtual void nextGaussian(dbl_vec_t& gaussianVector) override;
     virtual rng_ptr_t clone(void) const override;
     virtual size_t simDimension(void) const override;
+    virtual void skipTo(uint_t b) override;
   private:
     void reset(void);
     void next(void);
-    void skipTo(uint_t b);
   private:
     size_t      m_Dimension;
     uint_vec_t  m_State;

@@ -10,6 +10,7 @@
 #include <iterator>
 #include <algorithm>
 #include <sstream>
+#include <cstring>
 
 namespace orca
 {

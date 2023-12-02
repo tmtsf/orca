@@ -28,7 +28,12 @@ namespace orca { namespace test {
 
     simulation::rng::Sobol rng;
     size_t numPaths = std::pow(2, 26) - 1;
+
+    const auto start{std::chrono::steady_clock::now()};
     auto results = simulation::simulate(model, option, rng, numPaths);
+    const auto end{std::chrono::steady_clock::now()};
+    const std::chrono::duration<double> elapsed_seconds{end - start};
+    std::cout << "Serial simulation: " << elapsed_seconds.count() << "s\n";
 
     double sum(0.);
     for (const auto& path : results)
@@ -39,6 +44,6 @@ namespace orca { namespace test {
       }
     }
 
-    std::cout << sum / numPaths << std::endl;
+    std::cout << "European option price: " << sum / numPaths << std::endl;
   }
 }}
