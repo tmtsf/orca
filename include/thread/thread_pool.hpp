@@ -1,10 +1,6 @@
 #pragma once
 
-#include <thread>
-#include <vector>
-#include <future>
-#include <algorithm>
-#include <chrono>
+#include "common/common.hpp"
 #include "thread/concurrent_queue.hpp"
 
 namespace orca { namespace thread {

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <queue>
-#include <mutex>
-#include <condition_variable>
+#include "common/common.hpp"
 
 namespace orca { namespace thread {
   template<typename T>

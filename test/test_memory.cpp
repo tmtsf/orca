@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "experiment/memory/matrix.hpp"
+#include "experiment/memory/dist.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -41,6 +42,45 @@ namespace orca { namespace test {
       const auto end{std::chrono::steady_clock::now()};
       const std::chrono::duration<double> elapsed_seconds{end - start};
       std::cout << "Smart matrix multiplication: " << elapsed_seconds.count() << "s\n";
+    }
+  }
+
+  TEST(Memory, Distribution)
+  {
+    size_t n = 5000000;
+    dbl_vec_t data(n);
+    srand(12345);
+
+    std::generate(data.begin(),
+                  data.end(),
+                  [](){ return rand() * 1. / RAND_MAX; });
+
+    dbl_vec_t knots = {.1, .15, .2, .21, .25, .35, .4, .5, .55,
+                       .6, .7, .75, .8, .85, .9, .95};
+
+    {
+      const auto start{std::chrono::steady_clock::now()};
+      int_vec_t result = experiment::memory::dist(data, knots);
+      const auto end{std::chrono::steady_clock::now()};
+      const std::chrono::duration<double> elapsed_seconds{end - start};
+      std::cout << "Serial distribution calculation: " << elapsed_seconds.count() << "s\n";
+
+      std::cout << "result: \n";
+      std::for_each(result.cbegin(),
+                    result.cend(),
+                    [=](int i){ std::cout << i * 1. / n << "\n"; });
+    }
+    {
+      const auto start{std::chrono::steady_clock::now()};
+      int_vec_t result = experiment::memory::parallelDist(data, knots);
+      const auto end{std::chrono::steady_clock::now()};
+      const std::chrono::duration<double> elapsed_seconds{end - start};
+      std::cout << "Parallel distribution calculation: " << elapsed_seconds.count() << "s\n";
+
+      std::cout << "result: \n";
+      std::for_each(result.cbegin(),
+                    result.cend(),
+                    [=](int i){ std::cout << i * 1. / n << "\n"; });
     }
   }
 }}

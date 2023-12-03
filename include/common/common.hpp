@@ -11,6 +11,11 @@
 #include <algorithm>
 #include <sstream>
 #include <cstring>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+#include <chrono>
 
 namespace orca
 {
@@ -26,4 +31,7 @@ namespace orca
 
   using ulong_t = unsigned long;
   using ulong_vec_t = std::vector<ulong_t>;
+
+  using int_t = int;
+  using int_vec_t = std::vector<int_t>;
 }

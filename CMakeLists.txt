@@ -3,7 +3,7 @@ project(orca)
 
 set(CMAKE_CXX_STANDARD 17)
 if (MSVC)
-  set(CMAKE_CXX_FLAGS "/O3 /EHsc")
+  set(CMAKE_CXX_FLAGS "/O2 /EHsc")
 else()
   set(CMAKE_CXX_FLAGS "-O3 -fopenmp -mavx")
 endif()
