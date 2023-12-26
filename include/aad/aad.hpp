@@ -5,7 +5,11 @@
 
 namespace orca { namespace aad {
   class Node;
+  using node_ptr_t = Node*;
+
   class Tape;
+  using tape_ptr_t = Tape*;
+
   class Number;
 
   template<typename T, size_t S>
@@ -26,4 +30,6 @@ namespace orca { namespace aad {
 
   template<typename T, size_t BlockSize>
   using array_list_t = std::list<array_t<T, BlockSize>>;
+
+
 }}

@@ -3,8 +3,13 @@
 #include "aad/aad.hpp"
 
 namespace orca { namespace aad{
+  class Number;
+  class Tape;
+
   class Node
   {
+    friend Number;
+    friend Tape;
   public:
     Node(void);
     Node(size_t arity);
