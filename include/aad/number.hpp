@@ -2,6 +2,8 @@
 
 #include "aad/node.hpp"
 #include "aad/tape.hpp"
+#include "math/util.hpp"
+#include "numeric/gaussian.hpp"
 
 namespace orca { namespace aad {
   class Number
@@ -135,7 +137,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator*(const Number& lhs, double rhs)
+    inline friend Number operator*(const Number& lhs, value_t rhs)
     {
       value_t e = lhs.value() * rhs;
       Number result(*lhs.m_Node, e);
@@ -143,7 +145,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator*(double lhs, const Number& rhs)
+    inline friend Number operator*(value_t lhs, const Number& rhs)
     {
       return rhs * lhs;
     }
@@ -156,7 +158,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator+(const Number& lhs, double rhs)
+    inline friend Number operator+(const Number& lhs, value_t rhs)
     {
       value_t e = lhs.value() + rhs;
       Number result(*lhs.m_Node, e);
@@ -164,7 +166,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator+(double lhs, const Number& rhs)
+    inline friend Number operator+(value_t lhs, const Number& rhs)
     {
       return rhs + lhs;
     }
@@ -177,7 +179,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator/(const Number& lhs, double rhs)
+    inline friend Number operator/(const Number& lhs, value_t rhs)
     {
       value_t e = lhs.value() / rhs;
       Number result(*lhs.m_Node, e);
@@ -185,7 +187,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator/(double lhs, const Number& rhs)
+    inline friend Number operator/(value_t lhs, const Number& rhs)
     {
       value_t e = lhs / rhs.value();
       Number result(*rhs.m_Node, e);
@@ -202,7 +204,7 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator-(const Number& lhs, double rhs)
+    inline friend Number operator-(const Number& lhs, value_t rhs)
     {
       value_t e = lhs.value() - rhs;
       Number result(*lhs.m_Node, e);
@@ -210,11 +212,107 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number operator-(double lhs, const Number& rhs)
+    inline friend Number operator-(value_t lhs, const Number& rhs)
     {
       value_t e = lhs - rhs.value();
       Number result(*rhs.m_Node, e);
       result.derivative() = -1.;
+
+      return result;
+    }
+    Number& operator*=(const Number& arg)
+    {
+      *this = *this * arg;
+      return *this;
+    }
+    Number& operator*=(value_t arg)
+    {
+      *this = *this * arg;
+      return *this;
+    }
+    Number& operator/=(const Number& arg)
+    {
+      *this = *this / arg;
+      return *this;
+    }
+    Number& operator/=(value_t arg)
+    {
+      *this = *this / arg;
+      return *this;
+    }
+    Number& operator+=(const Number& arg)
+    {
+      *this = *this + arg;
+      return *this;
+    }
+    Number& operator+=(value_t arg)
+    {
+      *this = *this + arg;
+      return *this;
+    }
+    Number& operator-=(const Number& arg)
+    {
+      *this = *this - arg;
+      return *this;
+    }
+    Number& operator-=(value_t arg)
+    {
+      *this = *this - arg;
+      return *this;
+    }
+    Number operator-(void) const
+    {
+      return 0. - *this;
+    }
+    Number operator+(void) const
+    {
+      return *this;
+    }
+    inline friend Number exp(const Number& arg)
+    {
+      double e = std::exp(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = e;
+
+      return result;
+    }
+    inline friend Number log(const Number& arg)
+    {
+      double e = std::log(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = 1. / arg.value();
+
+      return result;
+    }
+    inline friend Number sqrt(const Number& arg)
+    {
+      double e = std::sqrt(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = .5 / e;
+
+      return result;
+    }
+    inline friend Number fabs(const Number& arg)
+    {
+      double e = std::fabs(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = math::util::isPositive(arg.value()) ? 1. : -1.;
+
+      return result;
+    }
+    inline friend Number normalPDF(const Number& arg)
+    {
+      double e = numeric::normalPDF(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = -arg.value() * e;
+
+      return result;
+    }
+    inline friend Number normalCDF(const Number& arg)
+    {
+      double e = numeric::normalCDF(arg.value());
+      Number result(*arg.m_Node, e);
+      result.derivative() = numeric::normalPDF(arg.value());
 
       return result;
     }

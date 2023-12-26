@@ -34,4 +34,30 @@ namespace orca { namespace test {
     EXPECT_EQ(y.adjoint(), 2.);
     EXPECT_EQ(doubler.m_Multipier.adjoint(), 5.);
   }
+
+  namespace
+  {
+    template<typename T>
+    T f(T x[5])
+    {
+      T y1 = x[2] * (5.0 * x[0] + x[1]);
+      T y2 = log(y1);
+      T y = (y1 + x[3] * y2) * (y1 + y2);
+      return y;
+    }
+  }
+
+  TEST(AAD, Intrumentation)
+  {
+    aad::Number::m_Tape->rewind();
+
+    aad::Number x[5] = {aad::Number{1.}, aad::Number{2.}, aad::Number{3.}, aad::Number{4.}, aad::Number{5.}};
+    aad::Number y = f(x);
+    y.propagateToStart();
+
+    for (size_t i = 0; i < 5; ++i)
+    {
+      std::cout << "x[" << i << "] = " << x[i].adjoint() << std::endl;
+    }
+  }
 }}
