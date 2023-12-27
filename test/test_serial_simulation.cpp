@@ -3,7 +3,7 @@
 #include "simulation/rng/sobol.hpp"
 #include "simulation/model/bs.hpp"
 #include "simulation/product/euro_option.hpp"
-#include "simulation/util.hpp"
+#include "simulation/run.hpp"
 
 #include <iostream>
 

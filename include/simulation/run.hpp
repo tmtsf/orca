@@ -4,7 +4,9 @@
 #include "simulation/model.hpp"
 #include "simulation/product.hpp"
 #include "simulation/random_number_generator.hpp"
+#include "simulation/results.hpp"
 #include "thread/thread_pool.hpp"
+#include "aad/number.hpp"
 
 namespace orca { namespace simulation {
   namespace util {
@@ -136,4 +138,61 @@ namespace orca { namespace simulation {
     return results;
   }
 
+  auto defaultAggregator = [](const aad::number_vec_t& v){ return v[0]; };
+
+  template<typename F = decltype(defaultAggregator)>
+  inline SimulationResults simulate(const Model<aad::number_t>& model,
+                                    const Product<aad::number_t>& product,
+                                    const RandomNumberGenerator& rng,
+                                    size_t numPaths,
+                                    const F& aggregator = defaultAggregator)
+  {
+    auto m = model.clone();
+    auto r = rng.clone();
+
+    scenario_t<aad::number_t> path;
+    util::allocatePath(product.defline(), path);
+    m->allocate(product.timeline(), product.defline());
+
+    size_t numPayments = product.payoffLabels().size();
+    const aad::number_ptr_coll_t& params = m->parameters();
+    size_t numParams = params.size();
+
+    // initialize the tape, put all the model parameters on it, and mark
+    Tape& tape = *Number::m_Tape;
+    tape.clear();
+    m->putParametersOnTape();
+    m->init(product.timeline(), product.defline());
+    util::initializePath(path);
+    tape.mark();
+
+    r->init(m->simDimension());
+    aad::number_vec_t payoffs(numPayments);
+    dbl_vec_t gaussianVector(m->simDimension());
+
+    SimulationResults results(numPaths, numPayments, numParams);
+    for (size_t i = 0; i < numPaths; ++i)
+    {
+      tape.rewind();
+
+      r->nextGaussian(gaussianVector);
+      m->generatePath(gaussianVector, path);
+      product.payoffs(path, payoffs);
+      aad::number_t result = aggregator(payoffs)
+
+      result.propagateToMark();
+      results.m_Aggregated[i] = double(result);
+      aad::util::convert(payoffs.begin(), payoffs.end(), results.m_Payoffs[i].begin());
+    }
+
+    Number::propagateMarkToStart();
+    std::transform(params.begin(),
+                   params.end(),
+                   results.m_Risks.begin(),
+                   [numPaths](const number_ptr_t p)
+                   { return p->adjoint() / numPaths; });
+    tape.clear();
+
+    return results;
+  }
 }}

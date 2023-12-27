@@ -49,6 +49,11 @@ namespace orca { namespace aad {
         --it;
       } while (it != to);
     }
+    static void propagateMarkToStart(void)
+    {
+      propagateAdjoints(m_Tape->marked(),
+                        m_Tape->begin());
+    }
     void propagateAdjoints(Tape::iterator to)
     {
       adjoint() = 1.;
@@ -270,7 +275,7 @@ namespace orca { namespace aad {
     }
     inline friend Number exp(const Number& arg)
     {
-      double e = std::exp(arg.value());
+      value_t e = std::exp(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = e;
 
@@ -278,7 +283,7 @@ namespace orca { namespace aad {
     }
     inline friend Number log(const Number& arg)
     {
-      double e = std::log(arg.value());
+      value_t e = std::log(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = 1. / arg.value();
 
@@ -286,7 +291,7 @@ namespace orca { namespace aad {
     }
     inline friend Number sqrt(const Number& arg)
     {
-      double e = std::sqrt(arg.value());
+      value_t e = std::sqrt(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = .5 / e;
 
@@ -294,7 +299,7 @@ namespace orca { namespace aad {
     }
     inline friend Number fabs(const Number& arg)
     {
-      double e = std::fabs(arg.value());
+      value_t e = std::fabs(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = math::util::isPositive(arg.value()) ? 1. : -1.;
 
@@ -302,7 +307,7 @@ namespace orca { namespace aad {
     }
     inline friend Number normalPDF(const Number& arg)
     {
-      double e = numeric::normalPDF(arg.value());
+      value_t e = numeric::normalPDF(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = -arg.value() * e;
 
@@ -310,7 +315,7 @@ namespace orca { namespace aad {
     }
     inline friend Number normalCDF(const Number& arg)
     {
-      double e = numeric::normalCDF(arg.value());
+      value_t e = numeric::normalCDF(arg.value());
       Number result(*arg.m_Node, e);
       result.derivative() = numeric::normalPDF(arg.value());
 

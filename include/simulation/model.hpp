@@ -1,6 +1,7 @@
 #pragma once
 
 #include "simulation/simulation.hpp"
+#include "aad/number.hpp"
 
 namespace orca { namespace simulation {
   template<typename T>
@@ -27,6 +28,24 @@ namespace orca { namespace simulation {
     size_t numParams(void) const
     {
       return const_cast<Model*>(this)->parameters().size();
+    }
+
+    void putParametersOnTape(void)
+    {
+      putParametersOnTape<T>();
+    }
+  private:
+    template<typename U>
+    void putParametersOnTape()
+    {
+      // no-op for non-Number types
+    }
+    template<>
+    void putParametersOnTape<aad::number_t>()
+    {
+      const auto& params = parameters();
+      for (auto param : params)
+        param->putOnTape();
     }
   };
 }}

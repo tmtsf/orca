@@ -11,6 +11,10 @@ namespace orca { namespace aad {
   using tape_ptr_t = Tape*;
 
   class Number;
+  using number_t = Number;
+  using number_vec_t = std::vector<number_t>;
+  using number_ptr_t = number_t*;
+  using number_ptr_coll_t = std::vector<number_ptr_t>;
 
   template<typename T, size_t S>
   class BlockList;
