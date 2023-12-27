@@ -7,6 +7,7 @@
 #include "simulation/results.hpp"
 #include "thread/thread_pool.hpp"
 #include "aad/number.hpp"
+#include "aad/util.hpp"
 
 namespace orca { namespace simulation {
   namespace util {
@@ -159,7 +160,7 @@ namespace orca { namespace simulation {
     size_t numParams = params.size();
 
     // initialize the tape, put all the model parameters on it, and mark
-    Tape& tape = *Number::m_Tape;
+    aad::Tape& tape = *aad::Number::m_Tape;
     tape.clear();
     m->putParametersOnTape();
     m->init(product.timeline(), product.defline());
@@ -173,23 +174,23 @@ namespace orca { namespace simulation {
     SimulationResults results(numPaths, numPayments, numParams);
     for (size_t i = 0; i < numPaths; ++i)
     {
-      tape.rewind();
+      tape.rewindToMark();
 
       r->nextGaussian(gaussianVector);
       m->generatePath(gaussianVector, path);
       product.payoffs(path, payoffs);
-      aad::number_t result = aggregator(payoffs)
+      aad::number_t result = aggregator(payoffs);
 
       result.propagateToMark();
       results.m_Aggregated[i] = double(result);
       aad::util::convert(payoffs.begin(), payoffs.end(), results.m_Payoffs[i].begin());
     }
 
-    Number::propagateMarkToStart();
+    aad::Number::propagateMarkToStart();
     std::transform(params.begin(),
                    params.end(),
                    results.m_Risks.begin(),
-                   [numPaths](const number_ptr_t p)
+                   [numPaths](const aad::number_ptr_t p)
                    { return p->adjoint() / numPaths; });
     tape.clear();
 

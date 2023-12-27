@@ -7,6 +7,8 @@
 #include "math/util.hpp"
 
 namespace orca { namespace simulation { namespace product {
+  using std::max;
+
   template<typename T>
   class EuropeanOption : public Product<T>
   {
@@ -62,7 +64,7 @@ namespace orca { namespace simulation { namespace product {
     virtual void payoffs(const scenario_t<T>& path,
                          std::vector<T>& payoffs) const override
     {
-      payoffs[0] = std::max(path[0].m_Forwards[0] - m_Strike, 0.)
+      payoffs[0] = max(path[0].m_Forwards[0] - m_Strike, 0.)
                  * path[0].m_Discounts[0] / path[0].m_Numeraire;
     }
   private:
