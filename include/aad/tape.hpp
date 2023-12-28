@@ -14,7 +14,7 @@ namespace orca { namespace aad {
     Node* recordNode(void)
     {
       Node* node = m_Nodes.emplace_back(N);
-      if constexpr(N)
+      if constexpr(N != 0)
       {
         node->m_DerivativesToChildren = m_Derivatives.emplace_back_multi<N>();
         node->m_ChildrenAdjoints = m_ChildrenAdjoints.emplace_back_multi<N>();
