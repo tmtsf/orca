@@ -139,7 +139,7 @@ namespace orca { namespace simulation {
     return results;
   }
 
-  auto defaultAggregator = [](const aad::number_vec_t& v){ return v[0]; };
+  static auto defaultAggregator = [](const aad::number_vec_t& v){ return v[0]; };
 
   template<typename F = decltype(defaultAggregator)>
   inline SimulationResults simulate(const Model<aad::number_t>& model,

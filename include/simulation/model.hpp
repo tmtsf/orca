@@ -4,6 +4,20 @@
 #include "aad/number.hpp"
 
 namespace orca { namespace simulation {
+  namespace {
+    template<typename U>
+    void putParametersOnTapeT(const std::vector<U*>& params)
+    {
+      // no-op for non-Number types
+    }
+    template<>
+    void putParametersOnTapeT<aad::number_t>(const aad::number_ptr_coll_t& params)
+    {
+      for (auto param : params)
+        param->putOnTape();
+    }
+  }
+
   template<typename T>
   class Model
   {
@@ -32,20 +46,8 @@ namespace orca { namespace simulation {
 
     void putParametersOnTape(void)
     {
-      putParametersOnTape<T>();
+      putParametersOnTapeT<T>(parameters());
     }
   private:
-    template<typename U>
-    void putParametersOnTape()
-    {
-      // no-op for non-Number types
-    }
-    template<>
-    void putParametersOnTape<aad::number_t>()
-    {
-      const auto& params = parameters();
-      for (auto param : params)
-        param->putOnTape();
-    }
   };
 }}

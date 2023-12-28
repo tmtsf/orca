@@ -3,7 +3,7 @@
 #include "aad/number.hpp"
 
 namespace orca { namespace aad { namespace util {
-  template<typename IT>[numbers = none]
+  template<typename IT>
   inline void putOnTape(IT begin, IT end)
   {
     std::for_each(begin,
