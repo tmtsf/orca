@@ -131,8 +131,8 @@ namespace orca { namespace simulation { namespace model {
         size_t nL = defline[i].m_LiborDefs.size();
         for (size_t j = 0; j < nL; ++j)
         {
-          dbl_t dt = defline[i].m_LiborDefs[j].m_End - defline[i].m_LiborDefs[j].m_Start;
-          m_Libors[i][j] = (exp(m_DiscountRate * dt) - 1.) / dt;
+          dbl_t tau = defline[i].m_LiborDefs[j].m_End - defline[i].m_LiborDefs[j].m_Start;
+          m_Libors[i][j] = (exp(m_DiscountRate * tau) - 1.) / tau;
         }
       }
     }
@@ -154,7 +154,7 @@ namespace orca { namespace simulation { namespace model {
       size_t n = m_Timeline.size() - 1;
       for (size_t i = 0; i < n; ++i)
       {
-        spot = spot * exp(m_Drifts[i] + m_StandardDeviations[i] * gaussianVector[i]);
+        spot *= exp(m_Drifts[i] + m_StandardDeviations[i] * gaussianVector[i]);
         fillScenario(index, spot, path[index], (*m_Defline)[index]);
         ++index;
       }
@@ -192,9 +192,9 @@ namespace orca { namespace simulation { namespace model {
     }
   private:
     T m_Spot;
+    T m_Vol;
     T m_DiscountRate;
     T m_DividendYield;
-    T m_Vol;
     bool m_IsSpotMeasure;
 
     time_vec_t m_Timeline;

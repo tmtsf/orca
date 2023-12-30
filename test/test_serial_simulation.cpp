@@ -27,7 +27,7 @@ namespace orca { namespace test {
     auto option = simulation::product::EuropeanOption<double>(strike, expiry, settlement);
 
     simulation::rng::Sobol rng;
-    size_t numPaths = std::pow(2, 14) - 1;
+    size_t numPaths = std::pow(2, 18) - 1;
 
     const auto start{std::chrono::steady_clock::now()};
     auto results = simulation::simulate(model, option, rng, numPaths);
@@ -50,9 +50,9 @@ namespace orca { namespace test {
   TEST(SerialSimulation, EuropeanOptionAAD)
   {
     aad::number_t spot{100.};
+    aad::number_t vol{.2};
     aad::number_t discount{.03};
     aad::number_t dividend{.02};
-    aad::number_t vol{.2};
 
     auto model = simulation::model::BlackScholesModel<aad::number_t>(spot,
                                                                      vol,
@@ -62,11 +62,11 @@ namespace orca { namespace test {
 
     double strike{101.};
     double expiry{1.};
-    double settlement{1. + 2./365.};
+    double settlement{expiry + 2. / 365.};
     auto option = simulation::product::EuropeanOption<aad::number_t>(strike, expiry, settlement);
 
     simulation::rng::Sobol rng;
-    size_t numPaths = std::pow(2, 20) - 1;
+    size_t numPaths = std::pow(2, 18) - 1;
 
     const auto start{std::chrono::steady_clock::now()};
     auto results = simulation::simulate(model, option, rng, numPaths);
@@ -83,12 +83,49 @@ namespace orca { namespace test {
       }
     }
 
-    std::cout << "European option price: " << sum.value() / numPaths << std::endl;
+    sum /= numPaths;
+    std::cout << "European option price: " << sum.value() << std::endl;
     std::cout << "European option risks: " << std::endl;
 
     for (const auto& risk : results.m_Risks)
     {
       std::cout << risk << std::endl;
+    }
+
+    {
+      double bump = 1e-5;
+      std::vector<double> params{spot.value(), vol.value(), discount.value(), dividend.value()};
+      for (size_t i = 0; i < 4; ++i)
+      {
+        params[i] += bump;
+
+        auto bumpedModel = simulation::model::BlackScholesModel<double>(params[0],
+                                                                        params[1],
+                                                                        false,
+                                                                        params[2],
+                                                                        params[3]);
+        auto bumpedOption = simulation::product::EuropeanOption<double>(strike, expiry, settlement);
+
+        simulation::rng::Sobol bumpedRNG;
+        auto bumpedResults = simulation::simulate(bumpedModel, bumpedOption, bumpedRNG, numPaths);
+
+        double bumpedSum(0.);
+        for (const auto& path : bumpedResults)
+        {
+          for (const auto& result : path)
+          {
+            bumpedSum += result;
+          }
+        }
+
+        bumpedSum /= numPaths;
+        std::cout << "Parameter " << i << std::endl;
+        std::cout << "Bumped value is: " << bumpedSum << std::endl;
+        std::cout << "Bumped greek is: " << (bumpedSum - sum.value()) / bump
+                  << std::endl << std::endl;
+
+        params[i] -= bump;
+      }
     }
   }
 }}

@@ -53,19 +53,19 @@ namespace orca { namespace aad {
     }
 
     using iterator = BlockList<Node, BLOCKSIZE>::iterator;
-    auto begin(void)
+    iterator begin(void)
     {
       return m_Nodes.begin();
     }
-    auto end(void)
+    iterator end(void)
     {
       return m_Nodes.end();
     }
-    auto marked(void)
+    iterator marked(void)
     {
       return m_Nodes.mark();
     }
-    auto find(Node* node)
+    iterator find(Node* node)
     {
       return m_Nodes.find(node);
     }

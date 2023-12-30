@@ -43,15 +43,17 @@ namespace orca { namespace aad {
                                   Tape::iterator to)
     {
       auto it = from;
-      do
+      while (it != to)
       {
         it->propagateOne();
         --it;
-      } while (it != to);
+      }
+
+      it->propagateOne();
     }
     static void propagateMarkToStart(void)
     {
-      propagateAdjoints(m_Tape->marked(),
+      propagateAdjoints(std::prev(m_Tape->marked()),
                         m_Tape->begin());
     }
     void propagateAdjoints(Tape::iterator to)
@@ -321,24 +323,6 @@ namespace orca { namespace aad {
 
       return result;
     }
-    inline friend Number max(const Number& lhs, value_t rhs)
-    {
-      value_t e = std::max(lhs.value(), rhs);
-      Number result(*lhs.m_Node, e);
-      bool leftIsLarger = math::util::isLargerThanMachineTolerance(lhs.value(), rhs);
-      result.leftDerivative() = leftIsLarger ? 1. : 0.;
-
-      return result;
-    }
-    inline friend Number max(value_t lhs, const Number& rhs)
-    {
-      value_t e = std::max(lhs, rhs.value());
-      Number result(*rhs.m_Node, e);
-      bool leftIsLarger = math::util::isLargerThanMachineTolerance(lhs, rhs.value());
-      result.rightDerivative() = leftIsLarger ? 0. : 1.;
-
-      return result;
-    }
     inline friend Number max(const Number& lhs, const Number& rhs)
     {
       value_t e = std::max(lhs.value(), rhs.value());
@@ -348,6 +332,18 @@ namespace orca { namespace aad {
       result.rightDerivative() = leftIsLarger ? 0. : 1.;
 
       return result;
+    }
+    inline friend Number max(const Number& lhs, value_t rhs)
+    {
+      value_t e = std::max(lhs.value(), rhs);
+      Number result(*lhs.m_Node, e);
+      result.derivative() = math::util::isLargerThanMachineTolerance(lhs.value(), rhs) ? 1. : 0.;
+
+      return result;
+    }
+    inline friend Number max(value_t lhs, const Number& rhs)
+    {
+      return max(rhs, lhs);
     }
   private:
     value_t m_Value;

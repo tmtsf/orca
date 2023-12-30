@@ -193,12 +193,15 @@ namespace orca { namespace aad {
       iterator it = end();
       iterator b = begin();
 
-      do
+      while (it != b)
       {
         --it;
         if (&*it == element)
           return it;
-      } while (it != b);
+      }
+
+      if (&*it == element)
+          return it;
 
       return end();
     }

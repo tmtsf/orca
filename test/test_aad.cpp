@@ -45,6 +45,18 @@ namespace orca { namespace test {
       T y = (y1 + x[3] * y2) * (y1 + y2);
       return y;
     }
+
+    template<typename T>
+    T g(T x[4])
+    {
+      double dt = .5;
+      aad::Number mu = x[2] - x[3];
+      aad::Number drift = (mu - .5 * x[1] * x[1]) * dt;
+      aad::Number stdDev = x[1] * std::sqrt(dt);
+      aad::Number y = x[0] * exp(-x[3] * dt) * exp(drift + stdDev * (-.03));
+
+      return y;
+    }
   }
 
   TEST(AAD, Intrumentation)
@@ -58,6 +70,41 @@ namespace orca { namespace test {
     for (size_t i = 0; i < 5; ++i)
     {
       std::cout << "x[" << i << "] = " << x[i].adjoint() << std::endl;
+    }
+  }
+
+  namespace {
+
+  }
+
+  TEST(AAD, Bumping)
+  {
+    aad::Number::m_Tape->rewind();
+
+    aad::Number x[4] = {aad::Number{100.},
+                        aad::Number{.2},
+                        aad::Number{.03},
+                        aad::Number{.02}};
+    aad::Number y = g(x);
+    y.propagateToStart();
+
+    std::vector<double> adjoints(4);
+    for (size_t i = 0; i < 4; ++i)
+      adjoints[i] = x[i].adjoint();
+
+    double bump = 1e-5;
+    std::vector<double> bumpedAdjoints(4);
+    for (size_t i = 0; i < 4; ++i)
+    {
+      x[i] += bump;
+      aad::Number yBumped = g(x);
+      bumpedAdjoints[i] = (yBumped.value() - y.value()) / bump;
+      x[i] -= bump;
+    }
+
+    for (size_t i = 0; i < 4; ++i)
+    {
+      std::cout << adjoints[i] << "\t" << bumpedAdjoints[i] << std::endl;
     }
   }
 }}
