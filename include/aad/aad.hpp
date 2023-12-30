@@ -13,6 +13,7 @@ namespace orca { namespace aad {
   class Number;
   using number_t = Number;
   using number_vec_t = std::vector<number_t>;
+  using number_vec_vec_t = std::vector<number_vec_t>;
   using number_ptr_t = number_t*;
   using number_ptr_coll_t = std::vector<number_ptr_t>;
 

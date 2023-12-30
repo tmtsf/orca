@@ -10,7 +10,7 @@
 #include "aad/util.hpp"
 
 namespace orca { namespace simulation {
-  namespace util {
+  namespace {
     template<typename T>
     inline void allocatePath(const sample_def_vec_t& defline,
                             scenario_t<T>& path)
@@ -26,6 +26,20 @@ namespace orca { namespace simulation {
       for (auto& sample : path)
         sample.initialize();
     }
+
+    inline void initializeModelForParallelSimulation(const Product<aad::number_t>& product,
+                                                     Model<aad::number_t>& model,
+                                                     scenario_t<aad::number_t>& path)
+    {
+      aad::Tape& tape = *aad::Number::m_Tape;
+      tape.rewind();
+      model.putParametersOnTape();
+      model.init(product.timeline(), product.defline());
+      initializePath(path);
+      tape.mark();
+    }
+
+    const size_t BATCHSIZE = 64;
   }
 
   inline dbl_vec_vec_t simulate(const Model<dbl_t>& model,
@@ -47,8 +61,8 @@ namespace orca { namespace simulation {
     dbl_vec_t gaussianVector(m->simDimension());
 
     scenario_t<dbl_t> path;
-    util::allocatePath(product.defline(), path);
-    util::initializePath(path);
+    allocatePath(product.defline(), path);
+    initializePath(path);
 
     for (size_t i = 0; i < numPaths; ++i)
     {
@@ -65,8 +79,6 @@ namespace orca { namespace simulation {
                                         const RandomNumberGenerator& rng,
                                         size_t numPaths)
   {
-    const size_t BATCHSIZE = 128;
-
     auto m = model.clone();
 
     size_t numPayments = product.payoffLabels().size();
@@ -86,8 +98,8 @@ namespace orca { namespace simulation {
 
     for (auto& path : paths)
     {
-      util::allocatePath(product.defline(), path);
-      util::initializePath(path);
+      allocatePath(product.defline(), path);
+      initializePath(path);
     }
 
     // Build one random number generator per thread
@@ -152,7 +164,7 @@ namespace orca { namespace simulation {
     auto r = rng.clone();
 
     scenario_t<aad::number_t> path;
-    util::allocatePath(product.defline(), path);
+    allocatePath(product.defline(), path);
     m->allocate(product.timeline(), product.defline());
 
     size_t numPayments = product.payoffLabels().size();
@@ -164,7 +176,7 @@ namespace orca { namespace simulation {
     tape.clear();
     m->putParametersOnTape();
     m->init(product.timeline(), product.defline());
-    util::initializePath(path);
+    initializePath(path);
     tape.mark();
 
     r->init(m->simDimension());
@@ -193,6 +205,138 @@ namespace orca { namespace simulation {
                    [numPaths](const aad::number_ptr_t p)
                    { return p->adjoint() / numPaths; });
     tape.clear();
+
+    return results;
+  }
+
+  template<typename F = decltype(defaultAggregator)>
+  inline SimulationResults parallelSimulate(const Model<aad::number_t>& model,
+                                            const Product<aad::number_t>& product,
+                                            const RandomNumberGenerator& rng,
+                                            size_t numPaths,
+                                            const F& aggregator = defaultAggregator)
+  {
+    size_t numPayments = product.payoffLabels().size();
+    size_t numParams = model.numParams();
+
+    SimulationResults results(numPaths, numPayments, numParams);
+
+    aad::Number::m_Tape->clear();
+
+    thread::ThreadPool& pool = thread::ThreadPool::getInstance();
+    size_t numThreads = pool.numberOfThreads();
+
+    std::vector<std::unique_ptr<Model<aad::number_t>>> models(numThreads + 1);
+    for (auto& m : models)
+    {
+      m = model.clone();
+      m->allocate(product.timeline(), product.defline());
+    }
+
+    std::vector<scenario_t<aad::number_t>> paths(numThreads + 1);
+    for (auto& path : paths)
+    {
+      allocatePath(product.defline(), path);
+    }
+
+    aad::number_vec_vec_t payoffs(numThreads + 1, aad::number_vec_t(numPayments));
+
+    std::vector<aad::Tape> tapes(numThreads);
+    int_vec_t initialized(numThreads + 1, false);
+
+    initializeModelForParallelSimulation(product, *models[0], paths[0]);
+    initialized[0] = true;
+
+    std::vector<std::unique_ptr<RandomNumberGenerator>> rngs(numThreads + 1);
+    for (auto& r : rngs)
+    {
+      r = rng.clone();
+      r->init(models[0]->simDimension());
+    }
+
+    dbl_vec_vec_t gaussianVectors(numThreads + 1, dbl_vec_t(models[0]->simDimension()));
+
+    std::vector<thread::ThreadPool::future_t> futures;
+    futures.reserve(numPaths / BATCHSIZE + 1);
+
+    size_t firstPath = 0;
+    size_t pathsLeft = numPaths;
+    while (pathsLeft > 0)
+    {
+      size_t pathsInTask = std::min(pathsLeft, BATCHSIZE);
+
+      futures.push_back(pool.spawn( [&, firstPath, pathsInTask](void)
+                                    {
+                                      size_t index = pool.getIndex();
+                                      if (index > 0)
+                                        aad::Number::m_Tape = &tapes[index - 1];
+
+                                      if (!initialized[index])
+                                      {
+                                        initializeModelForParallelSimulation(product,
+                                                                             *models[index],
+                                                                             paths[index]);
+                                        initialized[index] = true;
+                                      }
+
+                                      auto& r = rngs[index];
+                                      r->skipTo(firstPath);
+
+                                      for (size_t i = 0; i < pathsInTask; ++i)
+                                      {
+                                        aad::Number::m_Tape->rewindToMark();
+                                        r->nextGaussian(gaussianVectors[index]);
+                                        models[index]->generatePath(gaussianVectors[index],
+                                                                    paths[index]);
+
+                                        product.payoffs(paths[index], payoffs[index]);
+
+                                        aad::number_t result = aggregator(payoffs[index]);
+                                        result.propagateToMark();
+
+                                        results.m_Aggregated[firstPath + i] = dbl_t(result);
+                                        aad::util::convert(payoffs[index].begin(),
+                                                           payoffs[index].end(),
+                                                           results.m_Payoffs[firstPath + i].begin());
+                                      }
+
+                                      return true;
+                                    }));
+
+      pathsLeft -= pathsInTask;
+      firstPath += pathsInTask;
+    }
+
+    for (auto& future : futures)
+      pool.activeWait(future);
+
+    aad::Number::propagateMarkToStart();
+
+    aad::tape_ptr_t mainTape = aad::Number::m_Tape;
+    for (size_t i = 0; i < numThreads; ++i)
+    {
+      if (initialized[i + 1])
+      {
+        aad::Number::m_Tape = &tapes[i];
+        aad::Number::propagateMarkToStart();
+      }
+    }
+
+    aad::Number::m_Tape = mainTape;
+
+    for (size_t i = 0; i < numParams; ++i)
+    {
+      results.m_Risks[i] = 0.;
+      for (size_t j = 0; j < models.size(); ++j)
+      {
+        if (initialized[j])
+          results.m_Risks[i] += models[j]->parameters()[i]->adjoint();
+      }
+
+      results.m_Risks[i] /= numPaths;
+    }
+
+    aad::Number::m_Tape->clear();
 
     return results;
   }

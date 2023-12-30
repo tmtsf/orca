@@ -74,17 +74,14 @@ namespace orca { namespace test {
     const std::chrono::duration<double> elapsed_seconds{end - start};
     std::cout << "Serial simulation: " << elapsed_seconds.count() << "s\n";
 
-    aad::number_t sum(0.);
-    for (const auto& path : results.m_Payoffs)
+    double sum(0.);
+    for (const auto& result : results.m_Aggregated)
     {
-      for (const auto& result : path)
-      {
-        sum += result;
-      }
+      sum += result;
     }
 
     sum /= numPaths;
-    std::cout << "European option price: " << sum.value() << std::endl;
+    std::cout << "European option price: " << sum << std::endl;
     std::cout << "European option risks: " << std::endl;
 
     for (const auto& risk : results.m_Risks)
@@ -121,7 +118,7 @@ namespace orca { namespace test {
         bumpedSum /= numPaths;
         std::cout << "Parameter " << i << std::endl;
         std::cout << "Bumped value is: " << bumpedSum << std::endl;
-        std::cout << "Bumped greek is: " << (bumpedSum - sum.value()) / bump
+        std::cout << "Bumped greek is: " << (bumpedSum - sum) / bump
                   << std::endl << std::endl;
 
         params[i] -= bump;
